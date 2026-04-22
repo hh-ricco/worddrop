@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1a1a2e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="pwa-manifest.json">
+  <title>WordDrop — Learn English by Playing</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-theme="dark">
+
+  <!-- ═══════════════════════════════════════════
+       SCREEN: Start / Word Pack Selection
+  ═══════════════════════════════════════════ -->
+  <div id="screen-start" class="screen active">
+    <div class="start-inner">
+      <h1 class="logo">WordDrop</h1>
+      <p class="tagline">Learn English by playing — no studying required</p>
+
+      <div id="pack-list" class="pack-list"></div>
+
+      <div class="start-actions">
+        <button id="btn-open-settings" class="btn btn-ghost">⚙ Settings</button>
+        <button id="btn-open-records" class="btn btn-ghost">📊 Records</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SCREEN: Game Canvas
+  ═══════════════════════════════════════════ -->
+  <div id="screen-game" class="screen">
+    <div class="canvas-wrapper">
+      <canvas id="game-canvas" width="750" height="1334"></canvas>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SCREEN: Session Summary
+  ═══════════════════════════════════════════ -->
+  <div id="screen-summary" class="screen">
+    <div class="summary-inner">
+      <h2>Session Complete</h2>
+      <div class="summary-stats">
+        <div class="stat"><span class="stat-value" id="sum-score">0</span><span class="stat-label">Score</span></div>
+        <div class="stat"><span class="stat-value" id="sum-words">0</span><span class="stat-label">Words</span></div>
+        <div class="stat"><span class="stat-value" id="sum-accuracy">0%</span><span class="stat-label">Accuracy</span></div>
+        <div class="stat"><span class="stat-value" id="sum-streak">0</span><span class="stat-label">Best Streak</span></div>
+      </div>
+      <div id="sum-word-list" class="sum-word-list"></div>
+      <div class="summary-actions">
+        <button id="btn-play-again" class="btn btn-primary">Play Again</button>
+        <button id="btn-back-home" class="btn btn-ghost">Choose Pack</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SCREEN: Learning Records
+  ═══════════════════════════════════════════ -->
+  <div id="screen-records" class="screen">
+    <div class="records-inner">
+      <div class="records-header">
+        <h2>Learning Records</h2>
+        <button id="btn-records-back" class="btn btn-ghost">← Back</button>
+      </div>
+      <div class="records-summary">
+        <div class="stat"><span class="stat-value" id="rec-streak">0</span><span class="stat-label">Day Streak 🔥</span></div>
+        <div class="stat"><span class="stat-value" id="rec-total">0</span><span class="stat-label">Words Learned</span></div>
+        <div class="stat"><span class="stat-value" id="rec-sessions">0</span><span class="stat-label">Sessions</span></div>
+      </div>
+      <div id="rec-calendar" class="rec-calendar"></div>
+      <h3>Weak Words (most errors)</h3>
+      <div id="rec-weak-words" class="rec-weak-words"></div>
+      <div class="records-actions">
+        <button id="btn-export-data" class="btn btn-ghost">⬇ Export Data (JSON)</button>
+        <button id="btn-reset-data" class="btn btn-danger">Reset All Progress</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       OVERLAY: Settings Panel
+  ═══════════════════════════════════════════ -->
+  <div id="overlay-settings" class="overlay hidden">
+    <div class="panel">
+      <div class="panel-header">
+        <h2>Settings</h2>
+        <button id="btn-settings-close" class="btn-icon">✕</button>
+      </div>
+
+      <div class="setting-group">
+        <label class="setting-row">
+          <span>Translation Language</span>
+          <select id="set-translation">
+            <option value="zh">中文</option>
+            <option value="ja">日本語</option>
+            <option value="es">Español</option>
+            <option value="fr">Français</option>
+            <option value="off">Off</option>
+          </select>
+        </label>
+
+        <label class="setting-row">
+          <span>Show Virtual Keyboard</span>
+          <input type="checkbox" id="set-keyboard" class="toggle">
+        </label>
+      </div>
+
+      <div class="setting-group">
+        <label class="setting-row">
+          <span>Accent</span>
+          <select id="set-accent">
+            <option value="us">🇺🇸 American English</option>
+            <option value="gb">🇬🇧 British English</option>
+          </select>
+        </label>
+
+        <label class="setting-row">
+          <span>Voice On/Off</span>
+          <input type="checkbox" id="set-tts" class="toggle">
+        </label>
+
+        <label class="setting-row">
+          <span>Spell Word on Miss <small>(letter-by-letter)</small></span>
+          <input type="checkbox" id="set-spell-on-miss" class="toggle">
+        </label>
+
+        <label class="setting-row">
+          <span>TTS Speed <small>(when no recording found)</small></span>
+          <input type="range" id="set-tts-speed" min="0.5" max="1.5" step="0.1">
+        </label>
+
+        <label class="setting-row">
+          <span>Sound Effects</span>
+          <input type="checkbox" id="set-sfx" class="toggle">
+        </label>
+
+        <label class="setting-row">
+          <span>Background Music</span>
+          <input type="checkbox" id="set-bgm" class="toggle">
+        </label>
+
+        <label class="setting-row">
+          <span>Volume</span>
+          <input type="range" id="set-volume" min="0" max="1" step="0.05">
+        </label>
+      </div>
+
+      <div class="setting-group">
+        <label class="setting-row">
+          <span>Speed</span>
+          <select id="set-speed">
+            <option value="beginner">Beginner (slow)</option>
+            <option value="normal">Normal</option>
+            <option value="fast">Fast</option>
+            <option value="expert">Expert</option>
+          </select>
+        </label>
+
+        <label class="setting-row">
+          <span>Theme</span>
+          <select id="set-theme">
+            <option value="dark">Dark</option>
+            <option value="light">Light</option>
+          </select>
+        </label>
+
+        <label class="setting-row">
+          <span>Giphy API Key <small>(optional)</small></span>
+          <input type="text" id="set-giphy-key" placeholder="Paste your key here" class="text-input">
+        </label>
+      </div>
+
+      <div class="setting-group">
+        <label class="setting-row">
+          <span>Upload Custom Word Pack (.yaml)</span>
+          <input type="file" id="set-upload-pack" accept=".yaml,.yml">
+        </label>
+        <div id="custom-pack-list" class="custom-pack-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       OVERLAY: Pause Menu
+  ═══════════════════════════════════════════ -->
+  <div id="overlay-pause" class="overlay hidden">
+    <div class="panel panel-sm">
+      <h2>Paused</h2>
+      <button id="btn-resume" class="btn btn-primary">Resume</button>
+      <button id="btn-end-session" class="btn btn-ghost">End Session</button>
+      <button id="btn-pause-settings" class="btn btn-ghost">⚙ Settings</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       JS — load order matters
+  ═══════════════════════════════════════════ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/records.js"></script>
+  <script src="js/word-loader.js"></script>
+  <script src="js/word-engine.js"></script>
+  <script src="js/input.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

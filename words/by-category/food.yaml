@@ -1,0 +1,166 @@
+meta:
+  id: food
+  name: Food & Drinks
+  icon: 🍽️
+  default_image_size: 200
+
+words:
+  - word: egg
+    emoji: 🥚
+    difficulty: 1
+    translations:
+      zh: 鸡蛋
+      ja: 卵
+      es: huevo
+      fr: œuf
+    tags: [food]
+
+  - word: cup
+    emoji: ☕
+    difficulty: 1
+    translations:
+      zh: 杯子
+      ja: カップ
+      es: taza
+      fr: tasse
+    tags: [objects]
+
+  - word: milk
+    emoji: 🥛
+    difficulty: 1
+    translations:
+      zh: 牛奶
+      ja: 牛乳
+      es: leche
+      fr: lait
+    tags: [drink]
+
+  - word: apple
+    emoji: 🍎
+    difficulty: 2
+    translations:
+      zh: 苹果
+      ja: りんご
+      es: manzana
+      fr: pomme
+    tags: [fruit]
+
+  - word: bread
+    emoji: 🍞
+    difficulty: 2
+    translations:
+      zh: 面包
+      ja: パン
+      es: pan
+      fr: pain
+    tags: [bakery]
+
+  - word: grape
+    emoji: 🍇
+    difficulty: 2
+    translations:
+      zh: 葡萄
+      ja: ぶどう
+      es: uva
+      fr: raisin
+    tags: [fruit]
+
+  - word: lemon
+    emoji: 🍋
+    difficulty: 2
+    translations:
+      zh: 柠檬
+      ja: レモン
+      es: limón
+      fr: citron
+    tags: [fruit]
+
+  - word: peach
+    emoji: 🍑
+    difficulty: 2
+    translations:
+      zh: 桃子
+      ja: もも
+      es: durazno
+      fr: pêche
+    tags: [fruit]
+
+  - word: pizza
+    emoji: 🍕
+    difficulty: 2
+    translations:
+      zh: 披萨
+      ja: ピザ
+      es: pizza
+      fr: pizza
+    tags: [food]
+
+  - word: mango
+    emoji: 🥭
+    difficulty: 2
+    translations:
+      zh: 芒果
+      ja: マンゴー
+      es: mango
+      fr: mangue
+    tags: [fruit]
+
+  - word: orange
+    emoji: 🍊
+    difficulty: 2
+    translations:
+      zh: 橙子
+      ja: オレンジ
+      es: naranja
+      fr: orange
+    tags: [fruit]
+
+  - word: cherry
+    emoji: 🍒
+    difficulty: 2
+    translations:
+      zh: 樱桃
+      ja: さくらんぼ
+      es: cereza
+      fr: cerise
+    tags: [fruit]
+
+  - word: banana
+    emoji: 🍌
+    difficulty: 2
+    translations:
+      zh: 香蕉
+      ja: バナナ
+      es: plátano
+      fr: banane
+    tags: [fruit]
+
+  - word: pineapple
+    emoji: 🍍
+    difficulty: 3
+    translations:
+      zh: 菠萝
+      ja: パイナップル
+      es: piña
+      fr: ananas
+    tags: [fruit]
+
+  - word: strawberry
+    emoji: 🍓
+    difficulty: 3
+    translations:
+      zh: 草莓
+      ja: いちご
+      es: fresa
+      fr: fraise
+    tags: [fruit]
+
+  - word: watermelon
+    emoji: 🍉
+    difficulty: 3
+    translations:
+      zh: 西瓜
+      ja: すいか
+      es: sandía
+      fr: pastèque
+    tags: [fruit]

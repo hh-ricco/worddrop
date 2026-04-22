@@ -1,0 +1,166 @@
+meta:
+  id: cn-p1
+  name: Grade 1 (CN)
+  icon: 📚
+  default_image_size: 200
+
+words:
+  - word: red
+    emoji: 🔴
+    difficulty: 1
+    translations:
+      zh: 红色
+      ja: あか
+      es: rojo
+      fr: rouge
+    tags: [color]
+
+  - word: blue
+    emoji: 🔵
+    difficulty: 1
+    translations:
+      zh: 蓝色
+      ja: あお
+      es: azul
+      fr: bleu
+    tags: [color]
+
+  - word: one
+    emoji: 1️⃣
+    difficulty: 1
+    translations:
+      zh: 一
+      ja: いち
+      es: uno
+      fr: un
+    tags: [number]
+
+  - word: two
+    emoji: 2️⃣
+    difficulty: 1
+    translations:
+      zh: 二
+      ja: に
+      es: dos
+      fr: deux
+    tags: [number]
+
+  - word: cat
+    emoji: 🐱
+    difficulty: 1
+    translations:
+      zh: 猫
+      ja: ねこ
+      es: gato
+      fr: chat
+    tags: [animal]
+
+  - word: dog
+    emoji: 🐶
+    difficulty: 1
+    translations:
+      zh: 狗
+      ja: いぬ
+      es: perro
+      fr: chien
+    tags: [animal]
+
+  - word: sun
+    emoji: ☀️
+    difficulty: 1
+    translations:
+      zh: 太阳
+      ja: たいよう
+      es: sol
+      fr: soleil
+    tags: [nature]
+
+  - word: hot
+    emoji: 🌡️
+    difficulty: 1
+    translations:
+      zh: 热
+      ja: あつい
+      es: caliente
+      fr: chaud
+    tags: [weather]
+
+  - word: cold
+    emoji: 🥶
+    difficulty: 1
+    translations:
+      zh: 冷
+      ja: さむい
+      es: frío
+      fr: froid
+    tags: [weather]
+
+  - word: big
+    emoji: 🔆
+    difficulty: 1
+    translations:
+      zh: 大
+      ja: おおきい
+      es: grande
+      fr: grand
+    tags: [adjective]
+
+  - word: hand
+    emoji: 🖐️
+    difficulty: 1
+    translations:
+      zh: 手
+      ja: て
+      es: mano
+      fr: main
+    tags: [body]
+
+  - word: eye
+    emoji: 👁️
+    difficulty: 1
+    translations:
+      zh: 眼睛
+      ja: め
+      es: ojo
+      fr: œil
+    tags: [body]
+
+  - word: nose
+    emoji: 👃
+    difficulty: 1
+    translations:
+      zh: 鼻子
+      ja: はな
+      es: nariz
+      fr: nez
+    tags: [body]
+
+  - word: mouth
+    emoji: 👄
+    difficulty: 2
+    translations:
+      zh: 嘴巴
+      ja: くち
+      es: boca
+      fr: bouche
+    tags: [body]
+
+  - word: apple
+    emoji: 🍎
+    difficulty: 2
+    translations:
+      zh: 苹果
+      ja: りんご
+      es: manzana
+      fr: pomme
+    tags: [fruit]
+
+  - word: water
+    emoji: 💧
+    difficulty: 2
+    translations:
+      zh: 水
+      ja: みず
+      es: agua
+      fr: eau
+    tags: [drink]

@@ -1,0 +1,126 @@
+meta:
+  id: cn-p2
+  name: Grade 2 (CN)
+  icon: 📚
+  default_image_size: 200
+
+words:
+  - word: black
+    emoji: ⬛
+    difficulty: 2
+    translations:
+      zh: 黑色
+      ja: くろ
+      es: negro
+      fr: noir
+    tags: [color]
+
+  - word: green
+    emoji: 🟢
+    difficulty: 2
+    translations:
+      zh: 绿色
+      ja: みどり
+      es: verde
+      fr: vert
+    tags: [color]
+
+  - word: three
+    emoji: 3️⃣
+    difficulty: 2
+    translations:
+      zh: 三
+      ja: さん
+      es: tres
+      fr: trois
+    tags: [number]
+
+  - word: happy
+    emoji: 😊
+    difficulty: 2
+    translations:
+      zh: 快乐
+      ja: うれしい
+      es: feliz
+      fr: heureux
+    tags: [emotion]
+
+  - word: sorry
+    emoji: 🙏
+    difficulty: 2
+    translations:
+      zh: 对不起
+      ja: ごめんなさい
+      es: lo siento
+      fr: désolé
+    tags: [expression]
+
+  - word: thank
+    emoji: 💐
+    difficulty: 2
+    translations:
+      zh: 感谢
+      ja: ありがとう
+      es: gracias
+      fr: merci
+    tags: [expression]
+
+  - word: school
+    emoji: 🏫
+    difficulty: 3
+    translations:
+      zh: 学校
+      ja: がっこう
+      es: escuela
+      fr: école
+    tags: [place]
+
+  - word: family
+    emoji: 👨‍👩‍👧‍👦
+    difficulty: 3
+    translations:
+      zh: 家人
+      ja: かぞく
+      es: familia
+      fr: famille
+    tags: [people]
+
+  - word: friend
+    emoji: 🤝
+    difficulty: 3
+    translations:
+      zh: 朋友
+      ja: ともだち
+      es: amigo
+      fr: ami
+    tags: [people]
+
+  - word: spring
+    emoji: 🌸
+    difficulty: 3
+    translations:
+      zh: 春天
+      ja: はる
+      es: primavera
+      fr: printemps
+    tags: [season]
+
+  - word: summer
+    emoji: ☀️
+    difficulty: 3
+    translations:
+      zh: 夏天
+      ja: なつ
+      es: verano
+      fr: été
+    tags: [season]
+
+  - word: winter
+    emoji: ❄️
+    difficulty: 3
+    translations:
+      zh: 冬天
+      ja: ふゆ
+      es: invierno
+      fr: hiver
+    tags: [season]

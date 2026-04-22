@@ -1,0 +1,11 @@
+{
+  "packs": [
+    { "id": "food",      "name": "Food & Drinks", "icon": "🍽️", "path": "words/by-category/food.yaml",      "type": "category" },
+    { "id": "animals",   "name": "Animals",        "icon": "🐾", "path": "words/by-category/animals.yaml",   "type": "category" },
+    { "id": "transport", "name": "Transport",      "icon": "🚌", "path": "words/by-category/transport.yaml", "type": "category" },
+    { "id": "nature",    "name": "Nature",         "icon": "🌿", "path": "words/by-category/nature.yaml",    "type": "category" },
+    { "id": "objects",   "name": "Objects",        "icon": "📦", "path": "words/by-category/objects.yaml",   "type": "category" },
+    { "id": "cn-p1",     "name": "Grade 1 (CN)",   "icon": "📚", "path": "words/by-grade/cn-primary-1.yaml", "type": "grade" },
+    { "id": "cn-p2",     "name": "Grade 2 (CN)",   "icon": "📚", "path": "words/by-grade/cn-primary-2.yaml", "type": "grade" }
+  ]
+}

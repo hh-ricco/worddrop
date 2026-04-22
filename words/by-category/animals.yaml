@@ -1,0 +1,206 @@
+meta:
+  id: animals
+  name: Animals
+  icon: 🐾
+  default_image_size: 200
+
+words:
+  - word: cat
+    emoji: 🐱
+    difficulty: 1
+    translations:
+      zh: 猫
+      ja: ねこ
+      es: gato
+      fr: chat
+    tags: [pet]
+
+  - word: dog
+    emoji: 🐶
+    difficulty: 1
+    translations:
+      zh: 狗
+      ja: いぬ
+      es: perro
+      fr: chien
+    tags: [pet]
+
+  - word: cow
+    emoji: 🐄
+    difficulty: 1
+    translations:
+      zh: 奶牛
+      ja: うし
+      es: vaca
+      fr: vache
+    tags: [farm]
+
+  - word: pig
+    emoji: 🐷
+    difficulty: 1
+    translations:
+      zh: 猪
+      ja: ぶた
+      es: cerdo
+      fr: cochon
+    tags: [farm]
+
+  - word: fish
+    emoji: 🐟
+    difficulty: 1
+    translations:
+      zh: 鱼
+      ja: さかな
+      es: pez
+      fr: poisson
+    tags: [sea]
+
+  - word: frog
+    emoji: 🐸
+    difficulty: 1
+    translations:
+      zh: 青蛙
+      ja: かえる
+      es: rana
+      fr: grenouille
+    tags: [amphibian]
+
+  - word: bear
+    emoji: 🐻
+    difficulty: 1
+    translations:
+      zh: 熊
+      ja: くま
+      es: oso
+      fr: ours
+    tags: [wild]
+
+  - word: duck
+    emoji: 🦆
+    difficulty: 1
+    translations:
+      zh: 鸭子
+      ja: あひる
+      es: pato
+      fr: canard
+    tags: [bird]
+
+  - word: lion
+    emoji: 🦁
+    difficulty: 1
+    translations:
+      zh: 狮子
+      ja: ライオン
+      es: león
+      fr: lion
+    tags: [wild]
+
+  - word: tiger
+    emoji: 🐯
+    difficulty: 2
+    translations:
+      zh: 老虎
+      ja: とら
+      es: tigre
+      fr: tigre
+    tags: [wild]
+
+  - word: horse
+    emoji: 🐴
+    difficulty: 2
+    translations:
+      zh: 马
+      ja: うま
+      es: caballo
+      fr: cheval
+    tags: [farm]
+
+  - word: shark
+    emoji: 🦈
+    difficulty: 2
+    translations:
+      zh: 鲨鱼
+      ja: さめ
+      es: tiburón
+      fr: requin
+    tags: [sea]
+
+  - word: panda
+    emoji: 🐼
+    difficulty: 2
+    translations:
+      zh: 熊猫
+      ja: パンダ
+      es: panda
+      fr: panda
+    tags: [wild]
+
+  - word: koala
+    emoji: 🐨
+    difficulty: 2
+    translations:
+      zh: 考拉
+      ja: コアラ
+      es: koala
+      fr: koala
+    tags: [wild]
+
+  - word: rabbit
+    emoji: 🐰
+    difficulty: 2
+    translations:
+      zh: 兔子
+      ja: うさぎ
+      es: conejo
+      fr: lapin
+    tags: [pet]
+
+  - word: monkey
+    emoji: 🐒
+    difficulty: 2
+    translations:
+      zh: 猴子
+      ja: さる
+      es: mono
+      fr: singe
+    tags: [wild]
+
+  - word: dolphin
+    emoji: 🐬
+    difficulty: 3
+    translations:
+      zh: 海豚
+      ja: いるか
+      es: delfín
+      fr: dauphin
+    tags: [sea]
+
+  - word: penguin
+    emoji: 🐧
+    difficulty: 3
+    translations:
+      zh: 企鹅
+      ja: ペンギン
+      es: pingüino
+      fr: pingouin
+    tags: [bird]
+
+  - word: elephant
+    emoji: 🐘
+    difficulty: 3
+    translations:
+      zh: 大象
+      ja: ぞう
+      es: elefante
+      fr: éléphant
+    tags: [wild]
+
+  - word: butterfly
+    emoji: 🦋
+    difficulty: 3
+    translations:
+      zh: 蝴蝶
+      ja: ちょうちょ
+      es: mariposa
+      fr: papillon
+    tags: [insect]

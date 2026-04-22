@@ -1,0 +1,116 @@
+meta:
+  id: nature
+  name: Nature
+  icon: 🌿
+  default_image_size: 200
+
+words:
+  - word: sun
+    emoji: ☀️
+    difficulty: 1
+    translations:
+      zh: 太阳
+      ja: たいよう
+      es: sol
+      fr: soleil
+    tags: [sky]
+
+  - word: moon
+    emoji: 🌙
+    difficulty: 1
+    translations:
+      zh: 月亮
+      ja: つき
+      es: luna
+      fr: lune
+    tags: [sky]
+
+  - word: star
+    emoji: ⭐
+    difficulty: 1
+    translations:
+      zh: 星星
+      ja: ほし
+      es: estrella
+      fr: étoile
+    tags: [sky]
+
+  - word: rain
+    emoji: 🌧️
+    difficulty: 1
+    translations:
+      zh: 雨
+      ja: あめ
+      es: lluvia
+      fr: pluie
+    tags: [weather]
+
+  - word: snow
+    emoji: ❄️
+    difficulty: 1
+    translations:
+      zh: 雪
+      ja: ゆき
+      es: nieve
+      fr: neige
+    tags: [weather]
+
+  - word: cloud
+    emoji: ☁️
+    difficulty: 2
+    translations:
+      zh: 云
+      ja: くも
+      es: nube
+      fr: nuage
+    tags: [sky]
+
+  - word: ocean
+    emoji: 🌊
+    difficulty: 2
+    translations:
+      zh: 海洋
+      ja: うみ
+      es: océano
+      fr: océan
+    tags: [water]
+
+  - word: river
+    emoji: 🏞️
+    difficulty: 2
+    translations:
+      zh: 河流
+      ja: かわ
+      es: río
+      fr: rivière
+    tags: [water]
+
+  - word: forest
+    emoji: 🌲
+    difficulty: 3
+    translations:
+      zh: 森林
+      ja: もり
+      es: bosque
+      fr: forêt
+    tags: [land]
+
+  - word: volcano
+    emoji: 🌋
+    difficulty: 3
+    translations:
+      zh: 火山
+      ja: かざん
+      es: volcán
+      fr: volcan
+    tags: [land]
+
+  - word: mountain
+    emoji: ⛰️
+    difficulty: 3
+    translations:
+      zh: 山
+      ja: やま
+      es: montaña
+      fr: montagne
+    tags: [land]

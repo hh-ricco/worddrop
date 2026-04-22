@@ -1,0 +1,96 @@
+meta:
+  id: transport
+  name: Transport
+  icon: 🚌
+  default_image_size: 200
+
+words:
+  - word: bus
+    emoji: 🚌
+    difficulty: 1
+    translations:
+      zh: 公共汽车
+      ja: バス
+      es: autobús
+      fr: bus
+    tags: [road]
+
+  - word: car
+    emoji: 🚗
+    difficulty: 1
+    translations:
+      zh: 汽车
+      ja: くるま
+      es: coche
+      fr: voiture
+    tags: [road]
+
+  - word: boat
+    emoji: 🚢
+    difficulty: 1
+    translations:
+      zh: 船
+      ja: ふね
+      es: barco
+      fr: bateau
+    tags: [sea]
+
+  - word: train
+    emoji: 🚆
+    difficulty: 2
+    translations:
+      zh: 火车
+      ja: でんしゃ
+      es: tren
+      fr: train
+    tags: [rail]
+
+  - word: plane
+    emoji: ✈️
+    difficulty: 2
+    translations:
+      zh: 飞机
+      ja: ひこうき
+      es: avión
+      fr: avion
+    tags: [air]
+
+  - word: truck
+    emoji: 🚚
+    difficulty: 2
+    translations:
+      zh: 卡车
+      ja: トラック
+      es: camión
+      fr: camion
+    tags: [road]
+
+  - word: rocket
+    emoji: 🚀
+    difficulty: 2
+    translations:
+      zh: 火箭
+      ja: ロケット
+      es: cohete
+      fr: fusée
+    tags: [space]
+
+  - word: bicycle
+    emoji: 🚲
+    difficulty: 3
+    translations:
+      zh: 自行车
+      ja: じてんしゃ
+      es: bicicleta
+      fr: vélo
+    tags: [road]
+
+  - word: helicopter
+    emoji: 🚁
+    difficulty: 3
+    translations:
+      zh: 直升机
+      ja: ヘリコプター
+      es: helicóptero
+      fr: hélicoptère
+    tags: [air]

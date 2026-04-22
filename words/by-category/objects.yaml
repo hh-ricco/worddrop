@@ -1,0 +1,126 @@
+meta:
+  id: objects
+  name: Objects
+  icon: 📦
+  default_image_size: 200
+
+words:
+  - word: hat
+    emoji: 🎩
+    difficulty: 1
+    translations:
+      zh: 帽子
+      ja: ぼうし
+      es: sombrero
+      fr: chapeau
+    tags: [clothing]
+
+  - word: bag
+    emoji: 👜
+    difficulty: 1
+    translations:
+      zh: 包
+      ja: かばん
+      es: bolso
+      fr: sac
+    tags: [clothing]
+
+  - word: key
+    emoji: 🔑
+    difficulty: 1
+    translations:
+      zh: 钥匙
+      ja: かぎ
+      es: llave
+      fr: clé
+    tags: [home]
+
+  - word: book
+    emoji: 📚
+    difficulty: 1
+    translations:
+      zh: 书
+      ja: ほん
+      es: libro
+      fr: livre
+    tags: [school]
+
+  - word: bell
+    emoji: 🔔
+    difficulty: 1
+    translations:
+      zh: 铃铛
+      ja: ベル
+      es: campana
+      fr: cloche
+    tags: [sound]
+
+  - word: clock
+    emoji: 🕐
+    difficulty: 2
+    translations:
+      zh: 时钟
+      ja: とけい
+      es: reloj
+      fr: horloge
+    tags: [time]
+
+  - word: chair
+    emoji: 🪑
+    difficulty: 2
+    translations:
+      zh: 椅子
+      ja: いす
+      es: silla
+      fr: chaise
+    tags: [furniture]
+
+  - word: phone
+    emoji: 📱
+    difficulty: 2
+    translations:
+      zh: 手机
+      ja: けいたい
+      es: teléfono
+      fr: téléphone
+    tags: [tech]
+
+  - word: table
+    emoji: 🪞
+    difficulty: 2
+    translations:
+      zh: 桌子
+      ja: テーブル
+      es: mesa
+      fr: table
+    tags: [furniture]
+
+  - word: pencil
+    emoji: ✏️
+    difficulty: 3
+    translations:
+      zh: 铅笔
+      ja: えんぴつ
+      es: lápiz
+      fr: crayon
+    tags: [school]
+
+  - word: umbrella
+    emoji: ☂️
+    difficulty: 3
+    translations:
+      zh: 雨伞
+      ja: かさ
+      es: paraguas
+      fr: parapluie
+    tags: [clothing]
+
+  - word: scissors
+    emoji: ✂️
+    difficulty: 3
+    translations:
+      zh: 剪刀
+      ja: はさみ
+      es: tijeras
+      fr: ciseaux
+    tags: [tools]
