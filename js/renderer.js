@@ -29,6 +29,39 @@ const Renderer = (() => {
   let _stripEntries  = [];  /* [{ word, typed, state, x, targetX, wrongFlashT }] */
   let _stripLastTs   = 0;
 
+  /* Particle & shake state (juice) */
+  let _particles       = [];  /* see emitBurst / emitShatter for shape */
+  let _particlesLastTs = 0;
+  let _shakeTime       = 0;
+  let _shakeDuration   = 0;
+  let _shakeIntensity  = 0;
+
+  /* Tier bar + tier banner */
+  let _tierBarFill     = 0;     /* smoothed combo value for bar animation */
+  let _tierBarLastTs   = 0;
+  let _tierBannerText  = null;
+  let _tierBannerTime  = 0;
+  let _tierBannerColor = '#fff';
+  const TIER_BAR_Y      = 1042;
+  const TIER_BAR_H      = 14;
+  const TIER_BAR_PAD_X  = 16;
+  const TIER_THRESHOLDS = [0, 5, 15, 30, 60, 100]; /* 6 entries: tier i ranges [i-1] .. [i] */
+  const TIER_STYLES = {
+    1: { fill: '#b8c2ff', dim: 'rgba(184,194,255,0.22)' },
+    2: { fill: '#7ed6ff', dim: 'rgba(126,214,255,0.22)' },
+    3: { fill: '#ffd447', dim: 'rgba(255,212,71,0.22)' },
+    4: { fill: '#ff8866', dim: 'rgba(255,136,102,0.22)' },
+    5: { fill: '#d97aff', dim: 'rgba(217,122,255,0.25)' },
+  };
+
+  function _tierFromCombo(c) {
+    if (c >= 60) return 5;
+    if (c >= 30) return 4;
+    if (c >= 15) return 3;
+    if (c >= 5)  return 2;
+    return 1;
+  }
+
   /* ── Init ──────────────────────────────────── */
   function init(c, virtualKeyCallback, pauseCallback, skipCallback) {
     canvas        = c;
@@ -106,7 +139,7 @@ const Renderer = (() => {
     const {
       gameState, spellCtx,
       fallingItems, activeItem, typingState,
-      score, streak, speedLabel,
+      score, streak, letterCombo = 0, speedLabel,
       settings, flashOverlay,
     } = state;
 
@@ -116,13 +149,24 @@ const Renderer = (() => {
 
     ctx.clearRect(0, 0, W, H);
     _drawBackground();
-    _drawHUD(score, streak, speedLabel);
+    _drawHUD(score, streak, letterCombo, speedLabel);
     _drawDangerLine();
 
+    /* Shake: applied only to the play-field layer, NOT HUD / strip / keyboard */
+    const shake = _computeShakeOffset();
+    ctx.save();
+    if (shake) ctx.translate(shake.x, shake.y);
+
     fallingItems.forEach(item => {
-      _drawFallingItem(item, activeItem && item.word.id === activeItem.word.id, settings);
+      /* Missed items are replaced by shatter particles — don't double-draw */
+      if (item.missed) return;
+      _drawFallingItem(item, activeItem && item.word.id === activeItem.word.id, settings, letterCombo);
     });
 
+    _updateAndDrawParticles();
+    ctx.restore();
+
+    _drawTierBar(letterCombo);
     _drawInputStrip();
     if (flashOverlay)           _drawFlash(flashOverlay.color, flashOverlay.alpha);
     if (spelling && spellCtx)   _drawSpellingCard(spellCtx);
@@ -130,6 +174,9 @@ const Renderer = (() => {
     /* Keyboard drawn last so it sits on top of the review card during typing */
     const kbVisible = _showKeyboard && (!spelling || spellCtx?.phase === 'typing');
     if (kbVisible) _drawKeyboard(typingState?.target);
+
+    /* Tier banner always on top (celebrates milestones even over keyboard) */
+    _drawTierBanner();
   }
 
   /* ── Background ────────────────────────────── */
@@ -143,28 +190,51 @@ const Renderer = (() => {
   }
 
   /* ── HUD ───────────────────────────────────── */
-  function _drawHUD(score, streak, speedLabel) {
+  function _drawHUD(score, streak, letterCombo, speedLabel) {
     ctx.fillStyle = 'rgba(0,0,0,0.35)';
     ctx.fillRect(0, 0, W, HUD_H);
 
-    /* Score */
-    ctx.font = 'bold 38px system-ui';
+    /* Score (left) */
+    ctx.font = 'bold 36px system-ui';
     ctx.fillStyle = '#e8e8f0';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.fillText(`${score}`, 30, HUD_H / 2);
+    ctx.fillText(`${score}`, 24, HUD_H / 2);
 
-    /* Streak */
-    ctx.textAlign = 'center';
-    ctx.font = 'bold 28px system-ui';
-    ctx.fillStyle = streak > 1 ? '#f5a623' : 'transparent';
-    ctx.fillText(`🔥 ×${streak}`, W / 2, HUD_H / 2);
+    /* Letter combo + multiplier (center, hero) */
+    const tier  = _tierFromCombo(letterCombo);
+    const style = TIER_STYLES[tier];
+    if (letterCombo > 0) {
+      ctx.shadowColor = style.fill;
+      ctx.shadowBlur  = 18;
+      ctx.fillStyle   = style.fill;
+      ctx.font        = 'bold 52px system-ui';
+      ctx.textAlign   = 'right';
+      ctx.fillText(`⚡${letterCombo}`, W / 2 + 10, HUD_H / 2);
+      ctx.font        = 'bold 32px system-ui';
+      ctx.textAlign   = 'left';
+      ctx.fillText(`×${tier}`, W / 2 + 22, HUD_H / 2 + 2);
+      ctx.shadowBlur  = 0;
+    } else {
+      ctx.fillStyle = 'rgba(255,255,255,0.18)';
+      ctx.font      = 'bold 36px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText(`⚡ 0`, W / 2, HUD_H / 2);
+    }
 
-    /* Speed label */
-    ctx.textAlign = 'right';
-    ctx.font = '20px system-ui';
+    /* Word streak (small, right of center) */
+    if (streak > 1) {
+      ctx.font      = 'bold 24px system-ui';
+      ctx.fillStyle = '#f5a623';
+      ctx.textAlign = 'left';
+      ctx.fillText(`🔥${streak}`, W - 200, HUD_H / 2 - 14);
+    }
+
+    /* Speed label (small, below word streak) */
+    ctx.font      = '16px system-ui';
     ctx.fillStyle = '#8888aa';
-    ctx.fillText(speedLabel || '', W - 100, HUD_H / 2);
+    ctx.textAlign = 'left';
+    ctx.fillText(speedLabel || '', W - 200, HUD_H / 2 + 22);
 
     /* Pause button */
     ctx.beginPath();
@@ -202,15 +272,24 @@ const Renderer = (() => {
   }
 
   /* ── Falling item ──────────────────────────── */
-  function _drawFallingItem(item, isActive, settings) {
+  function _drawFallingItem(item, isActive, settings, streak = 0) {
     const { word, x, y, img, shakeOffset, freezeTimer } = item;
     const size   = word.imageSize || 200;
     const cx     = x + shakeOffset;
     const frozen = freezeTimer > 0;
 
+    /* Combo-tier glow on the active falling image */
+    const tier = isActive ? _comboTier(streak) : 0;
+
     ctx.globalAlpha = isActive ? 1 : 0.4;
-    if (frozen)         { ctx.shadowColor = '#7ed6ff'; ctx.shadowBlur = 28; }
-    else if (isActive)  { ctx.shadowColor = '#e94560'; ctx.shadowBlur = 24; }
+    if (frozen) {
+      ctx.shadowColor = '#7ed6ff'; ctx.shadowBlur = 30;
+    } else if (isActive) {
+      if (tier === 0)      { ctx.shadowColor = '#e94560'; ctx.shadowBlur = 24; }
+      else if (tier === 1) { ctx.shadowColor = '#f5a623'; ctx.shadowBlur = 38; }
+      else if (tier === 2) { ctx.shadowColor = '#ffd447'; ctx.shadowBlur = 52; }
+      else                 { ctx.shadowColor = '#ffffff'; ctx.shadowBlur = 72; }
+    }
 
     if (img) {
       ctx.drawImage(img, cx - size / 2, y, size, size);
@@ -637,6 +716,251 @@ const Renderer = (() => {
     ctx.closePath();
   }
 
+  /* ── Particles & screen shake ──────────────── */
+  function _comboTier(combo) {
+    if (combo >= 30) return 3;
+    if (combo >= 15) return 2;
+    if (combo >= 5)  return 1;
+    return 0;
+  }
+
+  function triggerShake(intensity, ms) {
+    if (intensity <= _shakeIntensity && _shakeTime > 0) return;
+    _shakeIntensity = intensity;
+    _shakeDuration  = ms;
+    _shakeTime      = ms;
+  }
+
+  function _computeShakeOffset() {
+    if (_shakeTime <= 0) return null;
+    const t = _shakeTime / _shakeDuration;  /* 1 → 0 */
+    const mag = _shakeIntensity * t;
+    return { x: (Math.random() - 0.5) * 2 * mag, y: (Math.random() - 0.5) * 2 * mag };
+  }
+
+  /* Preset configs for emitBurst */
+  const BURST_PRESETS = {
+    letterHit: {
+      count: 10, speedMin: 160, speedMax: 320, life: 0.45, gravity: 220,
+      sizeMin: 3, sizeMax: 6, drag: 0.88,
+      colors: ['#ffffff', '#7ed6ff', '#f5a623'],
+    },
+    wordSuccess: {
+      count: 45, speedMin: 180, speedMax: 520, life: 1.1, gravity: 520,
+      sizeMin: 4, sizeMax: 10, drag: 0.97,
+      colors: ['#4caf50', '#7ed6ff', '#f5a623', '#ffd447', '#ffffff', '#ff6b9d'],
+    },
+    comboPulse: {
+      count: 20, speedMin: 240, speedMax: 480, life: 0.6, gravity: 0,
+      sizeMin: 3, sizeMax: 6, drag: 0.9,
+      colors: ['#ffd447', '#ffffff'],
+    },
+  };
+
+  function emitBurst(x, y, presetName) {
+    const p = BURST_PRESETS[presetName];
+    if (!p) return;
+    const count = p.count;
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = p.speedMin + Math.random() * (p.speedMax - p.speedMin);
+      _particles.push({
+        type:    'dot',
+        x, y,
+        vx:      Math.cos(angle) * speed,
+        vy:      Math.sin(angle) * speed - (presetName === 'wordSuccess' ? 120 : 0),
+        gravity: p.gravity,
+        drag:    p.drag,
+        life:    p.life,
+        maxLife: p.life,
+        size:    p.sizeMin + Math.random() * (p.sizeMax - p.sizeMin),
+        color:   p.colors[(Math.random() * p.colors.length) | 0],
+      });
+    }
+  }
+
+  /* Shatter a falling item: 4×4 grid of image slices flying outward with rotation */
+  function emitShatter(item) {
+    const size = item.word.imageSize || 200;
+    const cols = 4, rows = 4;
+    const cx   = item.x, cy = item.y;
+    const topLeftX = cx - size / 2, topLeftY = cy;
+    const sliceW = (item.img ? item.img.width  : size) / cols;
+    const sliceH = (item.img ? item.img.height : size) / rows;
+    const dW = size / cols, dH = size / rows;
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const pieceCx = topLeftX + c * dW + dW / 2;
+        const pieceCy = topLeftY + r * dH + dH / 2;
+        const dx = pieceCx - cx;
+        const dy = pieceCy - cy - size * 0.2;  /* bias upward a touch */
+        const dist = Math.hypot(dx, dy) || 1;
+        const speed = 220 + Math.random() * 260;
+        _particles.push({
+          type:    'slice',
+          img:     item.img,
+          emoji:   item.img ? null : item.word.emoji,
+          sx:      c * sliceW, sy: r * sliceH, sw: sliceW, sh: sliceH,
+          dw:      dW,         dh: dH,
+          x:       pieceCx,    y:  pieceCy,
+          vx:      (dx / dist) * speed + (Math.random() - 0.5) * 80,
+          vy:      (dy / dist) * speed - 120 + (Math.random() - 0.5) * 60,
+          gravity: 900,
+          drag:    0.995,
+          rot:     0,
+          rotVel:  (Math.random() - 0.5) * 10,
+          life:    1.2,
+          maxLife: 1.2,
+        });
+      }
+    }
+  }
+
+  function _updateAndDrawParticles() {
+    const now = performance.now();
+    const dt  = _particlesLastTs ? Math.min(0.05, (now - _particlesLastTs) / 1000) : 0;
+    _particlesLastTs = now;
+
+    if (_shakeTime > 0)       _shakeTime       = Math.max(0, _shakeTime       - dt * 1000);
+    if (_tierBannerTime > 0)  _tierBannerTime  = Math.max(0, _tierBannerTime  - dt * 1000);
+
+    for (let i = _particles.length - 1; i >= 0; i--) {
+      const p = _particles[i];
+      p.vx *= p.drag;
+      p.vy = p.vy * p.drag + p.gravity * dt;
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      if (p.rotVel) p.rot += p.rotVel * dt;
+      p.life -= dt;
+      if (p.life <= 0 || p.y > H + 100) { _particles.splice(i, 1); continue; }
+
+      const alpha = Math.max(0, Math.min(1, p.life / p.maxLife));
+      ctx.globalAlpha = alpha;
+
+      if (p.type === 'dot') {
+        ctx.fillStyle   = p.color;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur  = 10;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      } else if (p.type === 'slice') {
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        if (p.img) {
+          ctx.drawImage(p.img, p.sx, p.sy, p.sw, p.sh, -p.dw / 2, -p.dh / 2, p.dw, p.dh);
+        } else if (p.emoji) {
+          ctx.font = `${p.dw * 0.9}px serif`;
+          ctx.textAlign    = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(p.emoji, 0, 0);
+        }
+        ctx.restore();
+      }
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  function clearParticles() {
+    _particles       = [];
+    _shakeTime       = 0;
+    _tierBarFill     = 0;
+    _tierBannerText  = null;
+    _tierBannerTime  = 0;
+  }
+
+  /* ── Tier progress bar (above input strip) ─── */
+  function _drawTierBar(letterCombo) {
+    /* Smooth the combo value for a natural fill animation */
+    const now = performance.now();
+    const dt  = _tierBarLastTs ? Math.min(0.05, (now - _tierBarLastTs) / 1000) : 0;
+    _tierBarLastTs = now;
+    _tierBarFill += (letterCombo - _tierBarFill) * (1 - Math.exp(-dt * 10));
+
+    const barX = TIER_BAR_PAD_X;
+    const barW = W - TIER_BAR_PAD_X * 2;
+    const gap  = 5;
+    const segW = (barW - gap * 4) / 5;
+    const h    = TIER_BAR_H;
+    const r    = h / 2;
+    const y    = TIER_BAR_Y;
+
+    const tier     = _tierFromCombo(_tierBarFill);
+    const tierMin  = TIER_THRESHOLDS[tier - 1];
+    const tierMax  = TIER_THRESHOLDS[tier];
+    const progress = Math.max(0, Math.min(1, (_tierBarFill - tierMin) / (tierMax - tierMin)));
+
+    for (let i = 1; i <= 5; i++) {
+      const segX  = barX + (i - 1) * (segW + gap);
+      const style = TIER_STYLES[i];
+      /* Segment background */
+      ctx.fillStyle = 'rgba(255,255,255,0.04)';
+      _roundRect(segX, y, segW, h, r); ctx.fill();
+      /* Outline */
+      ctx.strokeStyle = style.dim;
+      ctx.lineWidth = 1;
+      _roundRect(segX, y, segW, h, r); ctx.stroke();
+      /* Fill */
+      let fill = 0;
+      if (i < tier) fill = 1;
+      else if (i === tier) fill = progress;
+      if (fill > 0) {
+        ctx.save();
+        _roundRect(segX, y, segW, h, r); ctx.clip();
+        ctx.fillStyle   = style.fill;
+        ctx.shadowColor = style.fill;
+        ctx.shadowBlur  = i === tier ? 10 : 4;
+        ctx.fillRect(segX, y, segW * fill, h);
+        ctx.restore();
+        ctx.shadowBlur = 0;
+      }
+      /* Tiny ×N label centered in each segment */
+      ctx.font      = 'bold 10px system-ui';
+      ctx.fillStyle = (fill >= 1 || (i === tier && progress > 0.4))
+        ? 'rgba(0,0,0,0.55)'
+        : 'rgba(255,255,255,0.35)';
+      ctx.textAlign    = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(`×${i}`, segX + segW / 2, y + h / 2);
+    }
+    ctx.textBaseline = 'alphabetic';
+  }
+
+  /* ── Tier banner ("Nice!" / "Great!" / …) ─── */
+  function triggerTierBanner(text, color) {
+    _tierBannerText  = text;
+    _tierBannerTime  = 1100;
+    _tierBannerColor = color || '#ffffff';
+  }
+
+  function _drawTierBanner() {
+    if (!_tierBannerText || _tierBannerTime <= 0) return;
+    const total = 1100;
+    const t     = _tierBannerTime / total;   /* 1 → 0 */
+    const appear = 1 - t;                    /* 0 → 1 */
+    const alpha  = t > 0.25 ? 1 : t / 0.25;  /* fade out at the end */
+    const scale  = 0.7 + Math.min(1, appear * 3) * 0.45;
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.translate(W / 2, H * 0.42);
+    ctx.scale(scale, scale);
+    ctx.font         = 'bold 110px system-ui';
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor  = _tierBannerColor;
+    ctx.shadowBlur   = 36;
+    ctx.fillStyle    = _tierBannerColor;
+    ctx.fillText(_tierBannerText, 0, 0);
+    ctx.shadowBlur = 0;
+    ctx.restore();
+    ctx.globalAlpha = 1;
+    ctx.textBaseline = 'alphabetic';
+  }
+
   function getDangerY() { return DANGER_Y; }
   function getCanvasW() { return W; }
   function getSpawnY()  { return HUD_H + 20; }
@@ -645,6 +969,7 @@ const Renderer = (() => {
     init, draw,
     setKeyboardVisible, highlightKey, resetKey, resetAllKeys,
     stripPushActive, stripUpdateTyped, stripWrongFlash, stripResolveActive, stripReset,
+    emitBurst, emitShatter, triggerShake, triggerTierBanner, clearParticles,
     getDangerY, getCanvasW, getSpawnY,
   };
 })();

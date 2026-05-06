@@ -180,6 +180,34 @@ const Audio = (() => {
     }, 50);
   }
 
+  /* ── Per-letter pentatonic blip (Web Audio) ─
+     Gives each correct keystroke a note rising through the word,
+     so a full word sounds like a short melody. */
+  let _audioCtx = null;
+  const PENTATONIC = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50]; /* C5 D5 E5 G5 A5 C6 */
+
+  function playKeyBlip(letterIndex = 0) {
+    if (!settings?.sfxEnabled) return;
+    try {
+      if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const ctx  = _audioCtx;
+      if (ctx.state === 'suspended') ctx.resume();
+      const now  = ctx.currentTime;
+      const freq = PENTATONIC[Math.min(PENTATONIC.length - 1, letterIndex)];
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, now);
+      const peak = Math.max(0.0001, _vol() * 0.18);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(peak,    now + 0.008);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.16);
+    } catch { /* no-op */ }
+  }
+
   /* ── Sound effects ─────────────────────────── */
   function playSuccess() {
     if (!settings?.sfxEnabled) return;
@@ -211,5 +239,5 @@ const Audio = (() => {
     if (failSound) failSound.volume(vol * 0.5);
   }
 
-  return { init, speakWord, speak, stopSpeech, prefetchWord, playSuccess, playFail, startBGM, stopBGM, updateVolume };
+  return { init, speakWord, speak, stopSpeech, prefetchWord, playSuccess, playFail, playKeyBlip, startBGM, stopBGM, updateVolume };
 })();

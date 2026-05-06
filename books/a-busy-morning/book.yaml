@@ -1,0 +1,40 @@
+meta:
+  id: a-busy-morning
+  title: A Busy Morning
+  author: WordDrop Sample
+  source: "Original sample content"
+  cover: 🌅
+  level: 2
+
+pages:
+  - image: ⏰
+    text: "The alarm rings at seven."
+    key_words: [alarm, seven]
+
+  - image: 🛏️
+    text: "I jump out of bed."
+    key_words: [jump, bed]
+
+  - image: 🪥
+    text: "I brush my teeth."
+    key_words: [brush, teeth]
+
+  - image: 🥣
+    text: "I eat breakfast with milk."
+    key_words: [breakfast, milk]
+
+  - image: 👕
+    text: "I put on my shirt."
+    key_words: [shirt]
+
+  - image: 🎒
+    text: "I pack my school bag."
+    key_words: [pack, school]
+
+  - image: 🚌
+    text: "I take the yellow bus."
+    key_words: [yellow, bus]
+
+  - image: 🏫
+    text: "I arrive at the school."
+    key_words: [arrive]

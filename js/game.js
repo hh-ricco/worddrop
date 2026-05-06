@@ -5,10 +5,10 @@ const Game = (() => {
 
   /* ── Speed config ──────────────────────────── */
   const SPEED_CONFIGS = {
-    beginner: { spawnInterval: 25000, fallSpeed: 120, maxItems: 1 },
-    normal:   { spawnInterval: 15000, fallSpeed: 180, maxItems: 2 },
-    fast:     { spawnInterval: 10000, fallSpeed: 240, maxItems: 3 },
-    expert:   { spawnInterval:  6000, fallSpeed: 320, maxItems: 4 },
+    beginner: { spawnInterval: 25000, fallSpeed:  80, maxItems: 1 },
+    normal:   { spawnInterval: 15000, fallSpeed: 120, maxItems: 2 },
+    fast:     { spawnInterval: 10000, fallSpeed: 180, maxItems: 3 },
+    expert:   { spawnInterval:  6000, fallSpeed: 240, maxItems: 4 },
   };
 
   /* ── State ─────────────────────────────────── */
@@ -21,8 +21,10 @@ const Game = (() => {
   let typingState  = null;
 
   let score        = 0;
-  let streak       = 0;
+  let streak       = 0;       /* word-level streak (consecutive successful words) */
   let maxStreak    = 0;
+  let letterCombo  = 0;       /* letter-level combo, persists across words */
+  let maxCombo     = 0;
   let sessionResults = [];
 
   let lastTimestamp  = 0;
@@ -66,7 +68,13 @@ const Game = (() => {
     UI.init(settings, _onPackSelected, _onSettingsChanged);
     await UI.buildPackList(manifest, customPacks);
     Input.init(_onKey);
-    UI.showScreen('start');
+
+    /* Book mode setup */
+    await Book.init();
+    window._booksManifest = Book.getManifest();
+    UI.renderHomeRecent();
+
+    UI.showScreen('home');
   }
 
   /* ── Pack selected ─────────────────────────── */
@@ -79,6 +87,8 @@ const Game = (() => {
     }
     wordList    = WordLoader.parsePack(raw, packMeta.id);
     currentPack = packMeta;
+
+    Records.saveLastMode('drop', { packId: packMeta.id, packName: packMeta.name });
 
     const progress = Records.loadProgress();
     const turn     = Records.loadTurn();
@@ -95,6 +105,8 @@ const Game = (() => {
     score          = 0;
     streak         = 0;
     maxStreak      = 0;
+    letterCombo    = 0;
+    maxCombo       = 0;
     sessionResults = [];
     spawnTimer     = 0;
     flashOverlay   = null;
@@ -105,6 +117,7 @@ const Game = (() => {
     UI.showScreen('game');
     Renderer.setKeyboardVisible(settings.showKeyboard);
     Renderer.stripReset();
+    Renderer.clearParticles();
     Audio.startBGM();
 
     running = true;
@@ -216,7 +229,7 @@ const Game = (() => {
       fallingItems,
       activeItem,
       typingState,
-      score, streak,
+      score, streak, letterCombo,
       speedLabel: settings.speed?.toUpperCase(),
       settings,
       flashOverlay,
@@ -363,6 +376,28 @@ const Game = (() => {
     Renderer.stripUpdateTyped(typingState.typed);
     activeItem.freezeTimer = 1250;
 
+    /* Per-letter scoring with tier multiplier */
+    const oldTier = _comboTier(letterCombo);
+    score += 10 * oldTier;
+    letterCombo++;
+    if (letterCombo > maxCombo) maxCombo = letterCombo;
+    const newTier = _comboTier(letterCombo);
+    if (newTier > oldTier) {
+      score += (TIER_MILESTONE_BONUS[newTier] || 0);
+      Renderer.triggerTierBanner(TIER_BANNERS[newTier], TIER_COLORS[newTier]);
+      Renderer.triggerShake(4 + newTier, 200);
+    }
+    if (letterCombo === 100) {
+      score += COMBO_100_BONUS;
+      Renderer.triggerTierBanner('GODLIKE!', '#ffffff');
+      Renderer.triggerShake(14, 400);
+    }
+
+    /* Juice: small particle burst on image + pentatonic blip tied to letter position */
+    const size = activeItem.word.imageSize || 200;
+    Renderer.emitBurst(activeItem.x, activeItem.y + size / 2, 'letterHit');
+    Audio.playKeyBlip(typingState.cursorIndex - 1);
+
     if (typingState.cursorIndex >= typingState.target.length) {
       _onWordSuccess();
     }
@@ -380,6 +415,12 @@ const Game = (() => {
     );
     _setFlash('rgba(244,67,54,0.3)', 0.3);
     Audio.speakWord(activeItem.word.word);
+
+    /* Tier demotion: drop combo to bottom of previous tier (one tier down) */
+    if      (letterCombo >= 60) letterCombo = 30;
+    else if (letterCombo >= 30) letterCombo = 15;
+    else if (letterCombo >= 15) letterCombo = 5;
+    else                        letterCombo = 0;
   }
 
   /* ── Word outcomes ─────────────────────────── */
@@ -388,13 +429,14 @@ const Game = (() => {
     streak++;
     if (streak > maxStreak) maxStreak = streak;
 
+    /* Word-completion bonus: per-letter scoring already paid the bulk; this rewards
+       finishing fast, never erring, and stringing words together (word-level streak). */
     const dangerY  = Renderer.getDangerY();
     const remaining = Math.max(0, 1 - item.y / dangerY);
     const diff     = item.word.difficulty || 1;
     const diffMult = [1.0, 1.0, 1.5, 2.5][diff] || 1.0;
     const pts = Math.round((
-      100 +
-      remaining * 200 +
+      remaining * 100 +
       (STREAK_BONUS[Math.min(streak, 7)] || 0) +
       (item.errorCount === 0 ? 50 : 0) -
       item.errorCount * 5
@@ -404,6 +446,13 @@ const Game = (() => {
     sessionResults.push({ word: item.word.word, success: true, errors: item.errorCount });
     WordEngine.recordResult(item.word, item.errorCount, true);
     Renderer.stripResolveActive('success');
+
+    /* Juice: celebrate — confetti burst, plus combo-scaled shake */
+    const size = item.word.imageSize || 200;
+    Renderer.emitBurst(item.x, item.y + size / 2, 'wordSuccess');
+    if (streak >= 3)  Renderer.emitBurst(item.x, item.y + size / 2, 'comboPulse');
+    if (streak >= 5)  Renderer.triggerShake(6,  180);
+    if (streak >= 10) Renderer.triggerShake(10, 260);
 
     /* Remove from falling list */
     fallingItems = fallingItems.filter(i => i !== item);
@@ -418,10 +467,20 @@ const Game = (() => {
 
   async function _onWordMiss(item) {
     streak = 0;
+    /* Letter combo drops two tiers (≈ two wrong keys) — meaningful but not catastrophic */
+    const t = _comboTier(letterCombo);
+    const target = Math.max(1, t - 2);
+    letterCombo = TIER_THRESHOLDS[target - 1];
+
     sessionResults.push({ word: item.word.word, success: false, errors: item.errorCount });
     WordEngine.recordResult(item.word, item.errorCount, false);
     WordEngine.requeueMissed(item.word);
     Renderer.stripResolveActive('miss');
+
+    /* Juice: shatter the image + big screen shake */
+    Renderer.emitShatter(item);
+    Renderer.triggerShake(12, 320);
+
     Audio.playFail();
 
     if (settings.spellOnMiss !== false) {
@@ -582,7 +641,21 @@ const Game = (() => {
     if (s.bgmEnabled) Audio.startBGM(); else Audio.stopBGM();
   }
 
-  const STREAK_BONUS = [0, 0, 10, 20, 30, 50, 75, 100];
+  /* ── Scoring system ────────────────────────── */
+  const STREAK_BONUS         = [0, 0, 10, 20, 30, 50, 75, 100];
+  const TIER_THRESHOLDS      = [0, 5, 15, 30, 60];   /* index = tier-1, value = combo at start of tier */
+  const TIER_MILESTONE_BONUS = { 2: 25, 3: 75, 4: 200, 5: 500 };
+  const TIER_BANNERS         = { 2: 'Nice!', 3: 'Great!', 4: 'On Fire!', 5: 'Incredible!' };
+  const COMBO_100_BONUS      = 1000;
+  const TIER_COLORS          = { 1: '#b8c2ff', 2: '#7ed6ff', 3: '#ffd447', 4: '#ff8866', 5: '#d97aff' };
+
+  function _comboTier(combo) {
+    if (combo >= 60) return 5;
+    if (combo >= 30) return 4;
+    if (combo >= 15) return 3;
+    if (combo >= 5)  return 2;
+    return 1;
+  }
 
   return { boot, endSession, restart, pause, resume };
 })();

@@ -25,9 +25,46 @@ const UI = (() => {
     onSettingsChanged = settingsChangedCb;
 
     _applyTheme(settings.theme);
+    _bindHome();
     _bindSettings();
     _bindRecords();
     _bindPause();
+  }
+
+  /* ── Home mode selector ────────────────────── */
+  function _bindHome() {
+    document.querySelectorAll('.mode-card[data-mode]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mode = btn.dataset.mode;
+        if (mode === 'drop')      { Records.saveLastMode('drop'); showScreen('start'); }
+        else if (mode === 'book') { Book.openBookList(); }
+      });
+    });
+    document.getElementById('btn-drop-back')?.addEventListener('click', () => showScreen('home'));
+    document.getElementById('btn-book-list-back')?.addEventListener('click', () => showScreen('home'));
+  }
+
+  function renderHomeRecent() {
+    const el   = document.getElementById('home-recent');
+    if (!el) return;
+    const last = Records.loadLastMode();
+    if (!last) { el.classList.add('hidden'); return; }
+    el.classList.remove('hidden');
+    const label = last.mode === 'book' ? 'Continue reading' : 'Continue typing';
+    const title = last.mode === 'book'
+      ? (last.detail?.bookTitle || 'Last book')
+      : (last.detail?.packName  || 'Last pack');
+    el.innerHTML = `
+      <div>
+        <div class="home-recent-label">${label}</div>
+        <div class="home-recent-title">${title}</div>
+      </div>
+      <div class="home-recent-cta">→</div>
+    `;
+    el.onclick = () => {
+      if (last.mode === 'book') Book.openBookList();
+      else                       showScreen('start');
+    };
   }
 
   /* ── Word Pack List ────────────────────────── */
@@ -58,6 +95,22 @@ const UI = (() => {
           _raw: pack,
         }, true);
       });
+    }
+
+    /* Auto pack: words graduated from Book mode */
+    const bookMetaById = Object.fromEntries(
+      (window._booksManifest?.books || []).map(b => [b.id, b])
+    );
+    const autoPack = Records.getBooksAutoPack(bookMetaById);
+    if (autoPack.words.length > 0) {
+      _appendSectionTitle(container, 'From Books');
+      _appendPackCard(container, {
+        id:   autoPack.meta.id,
+        name: `${autoPack.meta.name} · ${autoPack.words.length} words`,
+        icon: autoPack.meta.icon,
+        type: 'from-books',
+        _raw: autoPack,
+      }, true);
     }
   }
 
@@ -190,7 +243,7 @@ const UI = (() => {
       showScreen('records');
     });
     document.getElementById('btn-records-back')?.addEventListener('click', () => {
-      showScreen('start');
+      showScreen('home');
     });
     document.getElementById('btn-export-data')?.addEventListener('click', () => {
       Records.exportAll();
@@ -263,7 +316,7 @@ const UI = (() => {
 
     document.getElementById('btn-play-again')?.addEventListener('click', () => window.Game?.restart(), { once: true });
     document.getElementById('btn-back-home')?.addEventListener('click', () => {
-      showScreen('start');
+      showScreen('home');
     }, { once: true });
 
     showScreen('summary');
@@ -272,5 +325,6 @@ const UI = (() => {
   return {
     init, showScreen, showOverlay, hideOverlay,
     buildPackList, showSummary, refreshCustomList,
+    renderHomeRecent,
   };
 })();

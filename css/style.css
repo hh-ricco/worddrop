@@ -412,3 +412,249 @@ input[type="range"]::-webkit-slider-thumb {
 
 /* ─── Utility ──────────────────────────────────── */
 .hidden { display: none !important; }
+
+/* ─── HOME (Mode Selector) ─────────────────────── */
+.home-inner {
+  width: 100%;
+  max-width: 520px;
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.home-recent {
+  width: 100%;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, var(--surface), var(--surface2));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+}
+.home-recent-label { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+.home-recent-title { font-size: 1rem; font-weight: 600; margin-top: 2px; }
+.home-recent-cta   { font-size: 1.4rem; color: var(--accent2); }
+
+.mode-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  width: 100%;
+}
+
+.mode-card {
+  padding: 28px 16px 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  transition: transform 0.15s, background 0.15s;
+}
+.mode-card:hover  { background: var(--surface2); transform: translateY(-2px); }
+.mode-card:active { transform: translateY(0); }
+.mode-icon  { font-size: 2.6rem; }
+.mode-title { font-size: 1.3rem; font-weight: 700; }
+.mode-desc  { font-size: 0.82rem; color: var(--text-dim); line-height: 1.35; }
+
+/* ─── Sub-header (used by Drop / Book list) ──── */
+.sub-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+.sub-header h2 { font-size: 1.3rem; font-weight: 700; flex: 1; }
+.sub-header .btn { flex: 0 0 auto; padding: 8px 14px; font-size: 0.85rem; }
+
+/* ─── BOOK LIST ────────────────────────────────── */
+.book-list-inner {
+  width: 100%;
+  max-width: 560px;
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+.book-card {
+  padding: 20px 14px;
+  background: #f4ecd8;
+  color: #3b2e1e;
+  border-radius: var(--radius);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  transition: transform 0.15s;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+.book-card:hover { transform: translateY(-2px); }
+.book-cover  { font-size: 3.2rem; line-height: 1; }
+.book-title  { font-weight: 700; font-size: 1rem; }
+.book-meta   { font-size: 0.75rem; color: #7a6a51; }
+
+/* ─── BOOK READER ──────────────────────────────── */
+#screen-book-reader {
+  /* Warm "paper" background — reads differently from Drop mode's cool dark */
+  background: #e9dec3;
+}
+#screen-book-reader.active { align-items: stretch; justify-content: stretch; padding: 0; }
+
+.reader-frame {
+  width: 100%;
+  height: 100vh;
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background: #f4ecd8;
+  color: #2b1f10;
+  box-shadow: 0 0 28px rgba(0,0,0,0.2);
+}
+
+.reader-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  flex: 0 0 auto;
+}
+.reader-header .btn {
+  background: transparent;
+  border: none;
+  color: #6b5a3f;
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+}
+.reader-title    { flex: 1; font-weight: 700; font-size: 1.1rem; color: #2b1f10; }
+.reader-progress { font-size: 0.85rem; color: #7a6a51; }
+
+.reader-page-viewport {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  position: relative;
+}
+
+.reader-page {
+  width: 100%;
+  max-width: 620px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  transition: transform 0.35s ease, opacity 0.25s ease;
+}
+.reader-page.slide-out-left  { transform: translateX(-100%); opacity: 0; }
+.reader-page.slide-in-right  { transform: translateX(100%); opacity: 0; }
+.reader-page.slide-out-right { transform: translateX(100%); opacity: 0; }
+.reader-page.slide-in-left   { transform: translateX(-100%); opacity: 0; }
+
+.reader-image {
+  font-size: 11rem;
+  line-height: 1;
+  padding: 10px 0;
+}
+.reader-image img {
+  max-width: 100%;
+  max-height: 340px;
+  object-fit: contain;
+}
+
+.reader-text {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.7rem;
+  line-height: 1.55;
+  text-align: center;
+  max-width: 90%;
+  color: #2b1f10;
+}
+.reader-text .word        { display: inline; }
+.reader-text .word.active { color: #c9730b; font-weight: 700; }
+.reader-text .word.cloze  { display: inline-block; border-bottom: 3px solid #c9730b; min-width: 60px; padding: 0 6px; color: #c9730b; font-weight: 700; letter-spacing: 0.05em; }
+.reader-text .word.cloze.current { background: rgba(201,115,11,0.15); }
+.reader-text .word.cloze.done    { color: var(--green); border-bottom-color: var(--green); }
+
+.reader-quiet-streak {
+  font-size: 0.85rem;
+  color: #7a6a51;
+  height: 18px;
+}
+.reader-quiet-streak .bloom { display: inline-block; animation: bloom 0.35s ease; }
+@keyframes bloom {
+  0%   { transform: scale(0.6); opacity: 0; }
+  70%  { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.reader-controls {
+  flex: 0 0 auto;
+  padding: 14px 16px 22px;
+  display: grid;
+  grid-template-columns: auto 1fr auto 1fr auto;
+  gap: 10px;
+  align-items: center;
+  border-top: 1px solid rgba(0,0,0,0.1);
+}
+.reader-controls .btn {
+  background: transparent;
+  color: #2b1f10;
+  border: 1px solid rgba(0,0,0,0.15);
+  padding: 10px;
+  font-size: 1rem;
+  flex: none;
+}
+.reader-controls .btn:hover { background: rgba(0,0,0,0.05); }
+.btn-icon-lg {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.reader-mode-toggle {
+  justify-self: center;
+  display: inline-flex;
+  background: rgba(0,0,0,0.06);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 2px;
+}
+.mode-pill {
+  padding: 6px 16px;
+  border: none;
+  background: transparent;
+  color: #6b5a3f;
+  font-weight: 600;
+  font-size: 0.85rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.mode-pill.active { background: #2b1f10; color: #f4ecd8; }

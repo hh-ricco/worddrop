@@ -13,18 +13,85 @@
 <body data-theme="dark">
 
   <!-- ═══════════════════════════════════════════
-       SCREEN: Start / Word Pack Selection
+       SCREEN: Home (mode selector)
   ═══════════════════════════════════════════ -->
-  <div id="screen-start" class="screen active">
-    <div class="start-inner">
+  <div id="screen-home" class="screen active">
+    <div class="home-inner">
       <h1 class="logo">WordDrop</h1>
-      <p class="tagline">Learn English by playing — no studying required</p>
+      <p class="tagline">Practice typing or read a story</p>
 
-      <div id="pack-list" class="pack-list"></div>
+      <div id="home-recent" class="home-recent hidden"></div>
+
+      <div class="mode-grid">
+        <button class="mode-card" data-mode="drop">
+          <div class="mode-icon">⚡</div>
+          <div class="mode-title">Drop</div>
+          <div class="mode-desc">Typing practice — fast, game-feel</div>
+        </button>
+        <button class="mode-card" data-mode="book">
+          <div class="mode-icon">📖</div>
+          <div class="mode-title">Book</div>
+          <div class="mode-desc">Read stories, learn words in context</div>
+        </button>
+      </div>
 
       <div class="start-actions">
         <button id="btn-open-settings" class="btn btn-ghost">⚙ Settings</button>
         <button id="btn-open-records" class="btn btn-ghost">📊 Records</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SCREEN: Drop — Word Pack Selection
+  ═══════════════════════════════════════════ -->
+  <div id="screen-start" class="screen">
+    <div class="start-inner">
+      <div class="sub-header">
+        <button id="btn-drop-back" class="btn btn-ghost">← Home</button>
+        <h2>Drop · Choose a pack</h2>
+      </div>
+
+      <div id="pack-list" class="pack-list"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SCREEN: Book — List
+  ═══════════════════════════════════════════ -->
+  <div id="screen-book-list" class="screen">
+    <div class="book-list-inner">
+      <div class="sub-header">
+        <button id="btn-book-list-back" class="btn btn-ghost">← Home</button>
+        <h2>Book · Pick a story</h2>
+      </div>
+      <div id="book-list" class="book-grid"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SCREEN: Book — Reader
+  ═══════════════════════════════════════════ -->
+  <div id="screen-book-reader" class="screen">
+    <div class="reader-frame">
+      <div class="reader-header">
+        <button id="btn-reader-back" class="btn btn-ghost">← Back</button>
+        <div class="reader-title" id="reader-title"></div>
+        <div class="reader-progress" id="reader-progress"></div>
+      </div>
+
+      <div class="reader-page-viewport">
+        <div id="reader-page" class="reader-page"></div>
+      </div>
+
+      <div class="reader-controls">
+        <button id="btn-reader-listen" class="btn btn-icon-lg" title="Listen">🔊</button>
+        <button id="btn-reader-prev"   class="btn btn-ghost">←</button>
+        <div class="reader-mode-toggle">
+          <button class="mode-pill" data-reader-mode="read">Read</button>
+          <button class="mode-pill" data-reader-mode="cloze">Practice</button>
+        </div>
+        <button id="btn-reader-next"   class="btn btn-ghost">→</button>
       </div>
     </div>
   </div>
@@ -53,7 +120,7 @@
       <div id="sum-word-list" class="sum-word-list"></div>
       <div class="summary-actions">
         <button id="btn-play-again" class="btn btn-primary">Play Again</button>
-        <button id="btn-back-home" class="btn btn-ghost">Choose Pack</button>
+        <button id="btn-back-home" class="btn btn-ghost">Home</button>
       </div>
     </div>
   </div>
@@ -206,9 +273,11 @@
   <script src="js/records.js"></script>
   <script src="js/word-loader.js"></script>
   <script src="js/word-engine.js"></script>
+  <script src="js/book-loader.js"></script>
   <script src="js/input.js"></script>
   <script src="js/renderer.js"></script>
   <script src="js/ui.js"></script>
+  <script src="js/book.js"></script>
   <script src="js/game.js"></script>
 </body>
 </html>

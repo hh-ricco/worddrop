@@ -1,0 +1,22 @@
+{
+  "books": [
+    {
+      "id": "little-red",
+      "title": "Little Red",
+      "author": "WordDrop Sample",
+      "cover": "🔴",
+      "level": 1,
+      "pageCount": 6,
+      "path": "books/little-red/book.yaml"
+    },
+    {
+      "id": "a-busy-morning",
+      "title": "A Busy Morning",
+      "author": "WordDrop Sample",
+      "cover": "🌅",
+      "level": 2,
+      "pageCount": 8,
+      "path": "books/a-busy-morning/book.yaml"
+    }
+  ]
+}

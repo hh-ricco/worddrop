@@ -1,9 +1,11 @@
 const Records = (() => {
-  const KEY_SESSIONS  = 'wordgame_sessions';
-  const KEY_PROGRESS  = 'wordgame_progress';
-  const KEY_SETTINGS  = 'wordgame_settings';
-  const KEY_CUSTOM    = 'wordgame_custom_packs';
-  const KEY_TURN      = 'wordgame_turn';
+  const KEY_SESSIONS   = 'wordgame_sessions';
+  const KEY_PROGRESS   = 'wordgame_progress';
+  const KEY_SETTINGS   = 'wordgame_settings';
+  const KEY_CUSTOM     = 'wordgame_custom_packs';
+  const KEY_TURN       = 'wordgame_turn';
+  const KEY_BOOK_PROG  = 'wordgame_book_progress';   /* per-book reading progress */
+  const KEY_LAST_MODE  = 'wordgame_last_mode';        /* {mode, detail, at} for home-screen "resume" */
 
   /* ── Settings ──────────────────────────────── */
   const DEFAULT_SETTINGS = {
@@ -164,7 +166,66 @@ const Records = (() => {
   }
 
   function resetAll() {
-    [KEY_SESSIONS, KEY_PROGRESS, KEY_CUSTOM, KEY_TURN].forEach(k => localStorage.removeItem(k));
+    [KEY_SESSIONS, KEY_PROGRESS, KEY_CUSTOM, KEY_TURN, KEY_BOOK_PROG, KEY_LAST_MODE]
+      .forEach(k => localStorage.removeItem(k));
+  }
+
+  /* ── Book reading progress ─────────────────── */
+  function loadBookProgress() {
+    try { return JSON.parse(localStorage.getItem(KEY_BOOK_PROG) || '{}'); }
+    catch { return {}; }
+  }
+  function saveBookProgress(bp) {
+    localStorage.setItem(KEY_BOOK_PROG, JSON.stringify(bp));
+  }
+  function recordBookPage(bookId, pageIndex, mode) {
+    const bp = loadBookProgress();
+    bp[bookId] = bp[bookId] || { readPages: {}, clozePages: {}, lastPage: 0, lastSeen: 0 };
+    const bucket = mode === 'cloze' ? 'clozePages' : 'readPages';
+    bp[bookId][bucket][pageIndex] = (bp[bookId][bucket][pageIndex] || 0) + 1;
+    bp[bookId].lastPage = pageIndex;
+    bp[bookId].lastSeen = Date.now();
+    bp[bookId].lastMode = mode;
+    saveBookProgress(bp);
+  }
+
+  /* Derive an auto-generated word pack from book progress.
+     A word "graduates" from books once it has ≥2 successful attempts across distinct days. */
+  function getBooksAutoPack(bookMetaById) {
+    const progress = loadProgress();
+    const words = [];
+    const seen  = new Set();
+    Object.values(progress).forEach(r => {
+      if (!r.packId?.startsWith('book::'))       return;
+      if (r.successes < 2)                       return;
+      if (seen.has(r.wordId))                    return;
+      seen.add(r.wordId);
+      const bookId = r.packId.replace(/^book::/, '');
+      const book   = bookMetaById?.[bookId];
+      words.push({
+        word:         r.wordId,
+        image:        r.image || null,
+        emoji:        r.emoji || (book?.cover || '📖'),
+        sentence:     r.sentence || '',
+        sourceBook:   book?.title || bookId,
+        difficulty:   1,
+        translations: {},
+        tags:         ['from-books'],
+      });
+    });
+    return {
+      meta: { id: 'auto::from-books', name: 'From Books', icon: '📖', type: 'custom' },
+      words,
+    };
+  }
+
+  /* ── Last-played mode (home screen resume) ── */
+  function loadLastMode() {
+    try { return JSON.parse(localStorage.getItem(KEY_LAST_MODE) || 'null'); }
+    catch { return null; }
+  }
+  function saveLastMode(mode, detail) {
+    localStorage.setItem(KEY_LAST_MODE, JSON.stringify({ mode, detail, at: Date.now() }));
   }
 
   return {
@@ -174,6 +235,8 @@ const Records = (() => {
     loadSessions, saveSession,
     loadTurn, incrementTurn,
     loadCustomPacks, saveCustomPack, removeCustomPack,
+    loadBookProgress, recordBookPage, getBooksAutoPack,
+    loadLastMode, saveLastMode,
     getStats, exportAll, resetAll,
   };
 })();

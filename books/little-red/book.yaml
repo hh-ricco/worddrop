@@ -1,0 +1,32 @@
+meta:
+  id: little-red
+  title: Little Red
+  author: WordDrop Sample
+  source: "Original sample content"
+  cover: 🔴
+  level: 1
+
+pages:
+  - image: 🍎
+    text: "I see a red apple."
+    key_words: [red, apple]
+
+  - image: 🚗
+    text: "I see a red car."
+    key_words: [car]
+
+  - image: 🌹
+    text: "I see a red rose."
+    key_words: [rose]
+
+  - image: ❤️
+    text: "I see a red heart."
+    key_words: [heart]
+
+  - image: 🎈
+    text: "I see a red balloon."
+    key_words: [balloon]
+
+  - image: 🌈
+    text: "Red is my favorite color."
+    key_words: [favorite, color]

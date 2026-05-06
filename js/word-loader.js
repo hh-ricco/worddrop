@@ -90,9 +90,10 @@ const WordLoader = (() => {
     const key = wordObj.id;
     if (imageCache[key] !== undefined) return imageCache[key];
 
-    /* 1. Contributor-specified image file */
+    /* 1. Contributor-specified image file — absolute paths (books/, http://, /) pass through */
     if (wordObj.imageFile) {
-      const url = `words/images/${wordObj.imageFile}`;
+      const isRooted = /^(https?:\/\/|\/|books\/)/.test(wordObj.imageFile);
+      const url = isRooted ? wordObj.imageFile : `words/images/${wordObj.imageFile}`;
       const ok = await _urlExists(url);
       if (ok) { imageCache[key] = url; return url; }
     }
