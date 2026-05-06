@@ -1,6 +1,3 @@
 name = "worddrop"
-compatibility_date = "2026-05-06"
+type = "javascript"
 
-# Cloudflare Pages 配置
-[env.production]
-name = "worddrop"
